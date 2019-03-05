@@ -1,0 +1,225 @@
+---
+title: "Student_VecDyn_Projects"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Intro
+
+VecDyn is a global database for spatially and temporally explicit presence-absence and abundance data. We accept and distribute data for animal and plant disease vectors. 
+
+For your projects you will be dealing with abundance data, which can be visualized as simple time-series graph The Y access represent the abundance of something at a particular point in time, in our case it will be a species of insect, and the X access represents the sample was measured. 
+
+ ![time-series-plot](/home/matthew/VecDyn Student projects/files/time-series-plot.png)
+
+
+
+#### Overview of data collection
+
+In order to adequately judge if the abundance data is accurate, that is we can rely on what it is telling us. We need minimal amounts of information, along with our abundance values and  sample date which can help us make informed decisions. 
+
+- **What** – description of the sample collected – (e.g. species, count)
+- **When** –  temporal information about time of collection. 
+- **Where** – geographical information about where the collection took place. 
+- **How** – operational information about how the collections were made. 
+- **Who**  – who has responsibility for the collection
+
+#### Data Sources
+
+##### Project 1: Crop Disease Vectors
+
+- GPDD
+  - Rothamsted Insect Survey Annual Report.	Hard Copy - Tabular	Taylor, L.R., Woiwod, I.P., MacCaulay, E.D.M., Dupuch, M.J. & Nicklen, J.	1990	None	Datasource ID: 502
+  	 Alternation of bottom-up and top-down regulation in a natural population of an agromyzid leafminer, Chromatomyia suikazurae.	Hard Copy - Graphical	Kato, M.	1994	None	Datasource ID:  589
+  	 Patterns of density dependence in moths and aphids.	Hard Copy - Graphical	Woiwod, I. & Hanski, I.	1992	Read from graphs digitally.	Datasource ID: 749
+  	 Population dynamics and abundance of deciduous tree - dwelling aphids.	Electronic transfer	Dixon, A.F.G.	1990	None	Datasource ID: 448
+
+		egular alternation of high and low population size of gall-forming aphids: analysis of ten years of data.	Hard Copy - Graphical	Wool, D.	1990	None	Datasource ID: 535
+
+KBS049: Aphid Collection Tower Site at KBS
+- https://lter.kbs.msu.edu/datasets/52
+
+##### Project 2: Mosquito Borne Disease Vectors
+
+- Laura Harrington
+
+  - CulexCount_Temp_Rainfall
+
+- Anastasia Mosquito Control District entomological monitoring
+  - https://zenodo.org/communities/vb-popbio/search?page=1&size=20&q=Anastasia%20Mosquito%20Control%20District%20entomological%20monitoring
+
+
+
+
+#### Mapping Data to Vecdyn Template
+
+##### General information 
+
+VecDyn data is stored in two separate files, one dedicated for storing publication information and one dedicated to storing time series data and meta-data (data describing how the data was collected and so on..  Data sets come in many forms, you may receive a data-set which contains all relevant data in one file or one that  split into several files or sources i.e. publication information from a web page and time series data from a file. 
+
+You may find that you can only complete each table partially and you end up with missing fields. Don't worry about this. We can decide if the data-set is complete at a later date and request information from the author if required before publishing it. 
+
+##### Template 
+
+Note that all data frame fields are created in character format,  we'll convert them to the correct formats at a later stage. 
+
+You can use this data frame as a guide to help you convert your data-set to the VecDyn format. You can either import data into into the data frames below or just rename the field names of the data-set you are working on.  However,  you need to make sure all the columns are in the correct order as below,  even if your data set is missing certain fields. In this case you need to create them  and leave them blank. 
+
+
+```{r}
+publication_information_template  <-data.frame(title=character(), 
+                 collection_author=character(),
+                 dataset_doi=character(),
+                 publication_doi = character(),
+                 description = character(),
+                 url = character(),
+                 contact_name=character(),
+                 contact_affiliation=character(),
+                 email=character(),
+                 orcid=character(),
+                 dataset_license=character(),
+                 data_rights=character(),
+                 embargo_release_date=character(),
+                 data_set_type=character(),
+                 stringsAsFactors=FALSE)
+
+#write.csv(publication_information_template, file = "publication_information_template.csv", row.names = FALSE)
+
+```
+
+
+```{r}
+
+vecdyn_template  <- data.frame(title = character(),
+                             taxon = character(),
+                             location_description = character(),
+                             study_collection_area = character(),
+                             geo_datum = character(),
+                             gps_obfuscation_info = character(),
+                             species_id_method = character(),
+                             study_design = character(),
+                             sampling_strategy = character(),
+                             sampling_method = character(),
+                             sampling_protocol = character(),
+                             measurement_unit = character(),
+                             value_transform = character(),
+                             sample_start_date = character(),
+                             sample_start_time = character(),
+                             sample_end_date =  character(),
+                             sample_end_time = character(),
+                             sample_value = character(),
+                             sample_sex = character(),
+                             sample_stage = character(),
+                             sample_location = character(),
+                             sample_collection_area = character(),
+                             sample_lat_dd = character(),
+                             sample_long_dd = character(),
+                             sample_environment = character(),
+                             additional_location_info = character(),
+                             additional_sample_info = character(),
+                             sample_name = character(),
+                             stringsAsFactors=FALSE)
+#write.csv(VecDyn_template, file = "VecDyn_template.csv", row.names = FALSE)
+                             
+```
+
+#### Special notes on mapping data to the vecdyn template
+
+##### Temporal referencing
+
+- Temporal referencing in the VecDyn database has been kept as straightforward as possible. Collection fields are set up to gather information on the date-time a collection was started and the date-time a collection ended.  Using this information it is easy to calculate information like the duration a trap was set or to calculate the duration of other relevant sampling methods like ecological belt transects or line transects. 
+- You'll probably find that most temporal information comes as a standard date. However, it often comes in many different formats and you'll need to convert it to  ISO 8601 date format (YYYY-MM-DD) for it to work with the VecDyn database. 
+- If only the month and year is supplied, then you should set the day to the first of the month in order for the database to except the temporal data. Make sure this is mentioned in the 'sampling_protocol' field e.g. state 'only months and years supplied, but day set to the first of each month for database formatting purposes'.  
+- If you receive temporal data in a date-time which combines date and time together, you'll need to separate them and add the time to the appropriate time field in the  ISO 8601 time format (hh:mm:ss) . 
+
+##### Spatial referencing
+
+In order to facilitate mapping and geo-spatial analysis, spatial referencing has been set up to track:
+
+1. General information about the study area e.g. in which area of the world it occurred country, region, municipality. The general study area is standardized in the web-app so it can  aid data visualization and searches, although  it does not necessarily  add useful statistical information.  Generally, if you are working on a  data-set which contains information on  administrative areas e.g. countries,  states or municipalities,  then this data should be combined and added to the 'location_description' description field,  each administrative division should be separated by a comma. 
+2. Specific information about a sample site,  where Global Positioning System (GPS) information can be inputted for each collection site or/and a descriptive name of the particular sample site. 
+
+The following two figure demonstrates the kind of spatial information that can be captured in the database. 
+
+
+
+![](files/sample-site-1.png)
+
+
+
+
+
+![](files/sample-site-2.png)
+
+
+
+
+
+
+
+### Data collection models 
+
+The following template descriptions should help you to map data to the VecDyn Template
+
+#### Publication Information Template
+
+| Field Name            | Required Y/N | Data format | Details                                                      | Additional Notes                                             |        Db table         |
+| --------------------- | ------------ | ----------- | ------------------------------------------------------------ | ------------------------------------------------------------ | :---------------------: |
+| title                 | Yes          | String      | Short title identifying the data set and the time frame  in which the study was conducted | E.g. “Mosquito Surveillance in Iowa 2016-2019”              | Publication Information |
+| collection_author     | Yes          | String      | Name of collection author                                    | E.g. name of a government authority, university department or individual researcher. | Publication Information |
+| dataset_doi    | No           | String      | Digital Object Identifier (DOI) of the the data-set           | If the data set was already published                        | Publication Information |
+| publication_doi    | No           | String      | Second Digital Object Identifier (DOI)                       | If connected to a published article                          | Publication Information |
+| description           | Yes          | String      | A short description about the data-set and the study  objectives | E.g. ‘Long term municipal surveillance of West Nile vector population in Athens, Greece (2000-2010)” | Publication Information |
+| url | No | String (URL) | web link to data-set source |  |  |
+| contact_name          | Yes        | String      | Name of person that may be contacted with inquiries about the data | E.g. name  of the person who may be contacted with inquiries about the data-set. This could also be the collection author, the person who compiled the data-set or the up-loader if there is not appropriate information. | Publication Information |
+| contact_affiliation   | No           | String      | Author/contact affiliation                                   | If different from collection author                          | Publication Information |
+| email                 | No           | String      | Contact email address                                        | Email address of the person who may be contacted with inquiries about the data-set. | Publication Information |
+| orchid              | No           | String      | Open Researcher and Contributor ID                           | A unique code used to identify scientific/academic authors and contributors | Publication Information |
+| dataset_license       | No           | String      | Creative commons license identification or equivalent.       | Where possible provide a creative commons license identification. See https://creativecommons.org  for more information. | Publication information |
+| data_rights | Yes | String | The data reuse policy  for the data set. | Write 'open' if available to the public, 'closed' If data is only available to certain groups or  'embargo' along with release date if under embargo. | Publication information |
+| embargo_release_date | No | Date | ISO 8601 date format (YYYY-MM-DD) | Date when the data-set will be freed from the embargo | Publication information |
+
+
+
+
+#### Main Data Collection Template
+
+The latest [vecdyn data collection template](https://github.com/vectorbite/VectorBiteDataPlatform/blob/master/static/Documentation/VecDyn/Template%26Scripts/VecDyn_template.csv) is available here
+
+
+| Field Name            | Required Y/N | Data format | Details                                                      | Additional Notes                                             |        Db table         |
+| --------------------- | ------------ | ----------- | ------------------------------------------------------------ | ------------------------------------------------------------ | :---------------------: |
+| title                 | Yes          | String      | Should be the same as the publication information title identifying the data set and the time frame  in which the study was conducted. | E.g. “Mosquito Surveillance in Iowa 2016-2019” | Publication Information |
+| taxon                 | Yes          | String      | Classification of sample collected                           | We only need the species name. taxonomic information is standardized when importing data into the database web app. |     Study Metadata      |
+| location_description  | Yes          | String      | General description of study location. note that sample locations are treated differently to study location. | In order of smallest geographic subdivision e.g.  district, town, county, state, country |     Study Metadata      |
+| study_collection_area | No           | String      | The spatial extent (bounding box, area or volume) of the study. | Information supplied here should represent the total study area. A study area could contain multiple sample sites. Note that bounding box information should be separated with a comma in the following order North, East South, West. |     Study Metadata      |
+| geo_datum             | No           | String      | Geodetic datum                                               | E.g. WGS 84                                                  |     Study Metadata      |
+| gps_obfuscation_info     | No           | String                            | GPS obfuscation information                                  | If GPS data obfuscation (e.g. GPS points are intentionally offset from their actual locations) or de-resolution occurs (e.g. GPS precision is intentionally reduced) , a statement on the manner by which this occurred. “GPS locations have been truncated to 3 decimals”; “GPS locations obfuscated using N-Dispersion”;  ”No GPS de-resolution was performed” |Study Metadata |
+| species_id_method | No   | String | Species identification method | A description of the methods used to identify the species e.g. “Morphological”  or  "Genotype". | Study Metadata |
+| study_design             | No           | String                            | Study design methodology                                     | Indicate if observational study i.e. prospective, retrospective, or experimental etc |     Study Metadata      |
+| sampling_strategy        | No           | String                            | Sampling_strategy, indicate the strategy used to select the sample | E.g. Probability sampling techniques, such as simple random sampling, systematic random sampling and stratified random sampling. Non-probability sampling techniques , such as self-selection sampling, convenience sampling, snowball sampling and purposive sampling. |     Study Metadata      |
+| sampling_method          | No           | String                            | Sampling apparatus e.g.trap type, observation method used to sample the entities. | E.g.    “CDC light trap” ,      “Tick drag”,      “Quadrat count”,       “BG Sentinel Trap” ,      “Pitfall trap”,       “Larval dip”,      “Johnson suction trap”,        or “Lindgren Funnel Trap” |     Study Metadata      |
+| sampling_protocol        | No           | String                            | How entities were sample                                     | The sampling protocol can further describe any distinguishing procedures used during sample collection e.g. if traps were set at specific times of day, or under specific weather conditions. Furthermore, this field should be used to describe any attractants/lures used to attract entities to a trap or collection site. |     Study Metadata      |
+| measurement_unit         | Yes          | String                            | Description of exactly what was observed, the unit for “Value” | ‘Count’, ‘Count (millions)’, ‘Harvest’, ‘Index of abundance’, ‘Index of territories’, ‘Leaf area’, ‘Mean Count’, ‘Not Specified’, ‘Percent cover’ and ‘Sample’ |     Study Metadata      |
+| value_transform          | No           | String                            | Note if the original values have been transformed – list details of the reference value of any data transformation | E.g .Base Year, Log, Proportion                              |     Study Metadata      |
+| sample_start_date        | No           | ISO 8601 date format (YYYY-MM-DD) | Date the data collection started                             | Note this field is only required when samples /observations were made between specific time frames |    Time Series data     |
+| sample_start_time        | No           | ISO 8601 time format (hh:mm:ss)   | Time the data collection started                             | Note this field is only required when samples /observations were made between specific time frames |    Time Series data     |
+| sample_end_date          | Yes          | ISO 8601 date format (YYYY-MM-DD) | Date the data collection ended                               |                                                              |    Time Series data     |
+| sample_end_time          | No           | ISO 8601 time format (hh:mm:ss)   | Time the data collection ended                               |                                                              |    Time Series data     |
+| sample_value             | Yes          | Integer/float                     | The numerical amount or result from the sample collection    | If presence / absence data, then values should be provided as 1 = species present & 0 = species absent |    Time Series data     |
+| sample_sex               | No           | String                            | Information on the sex of the organism sampled               |                                                              |    Time Series data     |
+| sample_stage             | No           | String                            | Information on the life stage of the organism sampled        | E.g adult, egg, larva, pupa                                  |    Time Series data     |
+| sample_location          | No           | String                            | Name of specific sample location                             |                                                              |    Time Series data     |
+| sample_collection_area   | No           | string                            | Area of sample location.                                 | If relevant (*e.g*., when collection method is transect or quadrat), in units of area or volume, the spatial coverage of the sampling unit. Note that bounding box information should be separated with a comma in the following order North, East South, West. |    Time Series data     |
+| sample_latitude_dd     | No           | Float                             | Latitude of sample area as a decimal degree Specific location of the sample | Ranges [-90,+90] for latitude (north-south measurement)      |    Time Series data     |
+| sample_longitude_dd    | No           | Float                             | Longitude of sample area as a decimal degree                 | Ranges [-180,180] for longitude (east-west measurement)      |    Time Series data     |
+| sample_environment | No | String | Additional c information relating to the environment | Should be used to describe specific information about the location / environment e.g.  forest, field , urban area; elevation. | Time Series data |
+| additional_location_info | No           | String                            | Additional geographic information                            | Should be used to describe specific information about the location e.g. near to house, near playing fields, Near to population of farm animals |    Time Series data     |
+| additional_sample_info   | No           | String                            | Additional sample information                                | Should be used to describe extra or specific information. about conditions at the time of sampling e.g. wind speeds, temperatures, weather. |    Time Series data     |
+| sample_name              | No           | String                            | A human readable sample name                                 | May exist solely for the benefit of the depositor in organizing their data, use their own internal naming conventions etc. Naming convention is not restricted, but any encoded metadata should be revealed in the other data fields. For example, you may name a sample named ‘Aphid1_StickyTrap_Jan4,’ but you will still have “Sticky Trap” listed in a Collection Method field, and “Jan 4, 2017” in the date field. |    Time Series data     |
+
+
+
+
