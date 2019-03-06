@@ -18,7 +18,7 @@ Example:
 
 ## Overview of data collection
 
-Along with the time series data, we need minimal amounts of information,  that can help us make informed decisions about the quality of the data e.g. was it measured accurately using the best equipment and do the methods used to select the sample represent the population in question. These concepts can be represented as follows:
+Along with the time series data, we need minimal amounts of information,  that can help us make informed decisions about the quality of the data e.g. was it measured accurately using the best equipment and do the sampling methods used to select the sample represent the population in question. These concepts can be represented as follows:
 
 - **What** – description of the sample collected – (e.g. species, count)
 - **When** –  temporal information about time of collection. 
@@ -54,14 +54,10 @@ The GDPP data will pose a slight challenge when converting them to the VecDyn fo
 
 #### Possible data-sets  
 
-  - https://www.vectorbase.org/popbio  (anything in the PopBio database)
-
-  You can also check 
-  - https://zenodo.org/communities/vb-popbio/
-  
-  - Anastasia Mosquito Control District entomological monitoring. https://zenodo.org/communities/vb-popbio/search?page=1&size=20&q=Anastasia%20Mosquito%20Control%20District%20entomological%20monitoring
-
-  - Laura Harrington culex data (we will send you this in a separate email). CulexCount_Temp_Rainfall
+    - https://www.vectorbase.org/popbio  (anything in the PopBio database)
+    - https://zenodo.org/communities/vb-popbio/
+    - Anastasia Mosquito Control District entomological monitoring. https://zenodo.org/communities/vb-popbio/search?page=1&size=20&q=Anastasia%20Mosquito%20Control%20District%20entomological%20monitoring
+    - Laura Harrington culex data (we will send you this in a separate email). CulexCount_Temp_Rainfall
 
 
 ## Mapping Data to Vecdyn Template
@@ -72,7 +68,7 @@ You can find the R code which will help you build a vecdyn template under the 'T
 
 ### General information about the VecDyn template
 
-VecDyn data is stored in two separate files, one dedicated for storing publication information and one dedicated to storing time-series data and meta-data (data describing how the data was collected).  Data-sets come in many forms, you may receive a data-set which contains all relevant data in one file or one that is split into several files or sources i.e. publication information from a web page and time series data from a file. 
+VecDyn data is stored in two separate files, one dedicated for storing publication information,  one dedicated for storing time-series data and meta-data (data describing how the data was collected).  Data-sets come in many forms, you may receive a data-set which contains all relevant data in one file or one that is split into several files or sources i.e. publication information from a web page and time series data from a file. 
 
 You may find that you can complete each table partially and you end up with missing fields. You can refer to the 'Data collection models' section below which lists which fields are required.  If you have any doubts we can decide if the data-set is complete at a later date and even request information from the author if required. 
 
