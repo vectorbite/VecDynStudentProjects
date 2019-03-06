@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 VecDyn is a global database for spatially and temporally explicit presence-absence and abundance data. We accept and distribute data for animal and plant disease vectors. 
 
-For your projects you will be dealing with abundance data, which can be visualized as simple time-series plot. The Y access represents the abundance of something at a particular point in time, in our case it will be a species of insect, and the X access represents when sample was measured. 
+For your projects you will be dealing with abundance data, which can be visualized as simple time-series plot. The Y access represents the abundance of something at a particular point in time, in our case it will be a species of insect, and the X access represents when a sample was measured or taken.  
 
 ```{r time-series-exmple, echo=FALSE, fig.align = "center", out.width = "100%", out.extra='', fig.ext='png'}
 knitr::include_graphics('./files/time-series-plot.png')
@@ -37,8 +37,8 @@ You can check the GDPP data-sets here. (https://vectorbiteonlineplatform.pythona
 
 You can find the GDPP user guide in files/GPDD_User_Guide.pdf. 
 
-The GDPP data will pose a slight challenge when converting them to the VecDyn format as the data format as the GPDD does not store exact
-sampling dates,  instead observations are temporally coded. you'll need to code this back into time stamped dates. more info below. 
+The GDPP data will pose a slight challenge when converting them to the VecDyn format as the GPDD does not store exact
+sampling dates,  instead observations are temporally coded. You'll need to convert these into time stamped dates. More info below. 
 
 ##### Possible data-sets
 
