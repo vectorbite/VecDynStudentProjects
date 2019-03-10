@@ -59,10 +59,11 @@ The GDPP data will pose a slight challenge when converting them to the VecDyn fo
     - Anastasia Mosquito Control District entomological monitoring. https://zenodo.org/communities/vb-popbio/search?page=1&size=20&q=Anastasia%20Mosquito%20Control%20District%20entomological%20monitoring
     - Laura Harrington culex data (we will send you this in a separate email). CulexCount_Temp_Rainfall
 
-
 ## Mapping Data to Vecdyn Template
 
-Your challenge will be to clean-up and process data-sets, mapping them to the vecdyn template. You'll probably need to use a number of packages and techniques to achieve this. You should refer to the 'R for Data Science guide'(https://r4ds.had.co.nz/) or materials you have been provided by Imperial.  
+Your challenge will be to clean-up and process data-sets, mapping them to the vecdyn template. Try to map what you can to the vecdyn template, you might that some data sets have way more information that what is required for the vecdyn database template (e.g. the GPDD data).  Work with R notebooks or rstudio markdown so you can save all your code and we can go back to it at a later date and re-edit if neseary. 
+
+You'll probably need to use a number of packages and techniques to achieve this. You should refer to the 'R for Data Science guide'(https://r4ds.had.co.nz/) or materials you have been provided by Imperial.  
 
 You can find the R code which will help you build a vecdyn template under the 'Template' section below. 
 
@@ -193,7 +194,6 @@ The following template descriptions should help you to map data to the VecDyn Te
 
 ### Special notes on mapping data to the vecdyn template
 
-
 #### Temporal referencing
 
 - Temporal referencing in the VecDyn database has been kept as straightforward as possible. Collection fields are set up to gather information on the date-time a collection was started and the date-time a collection ended.  Using this information it is easy to calculate information like the duration a trap was set or to calculate the duration of other relevant sampling methods like ecological belt transects or line transects. 
@@ -221,4 +221,21 @@ The following two figures demonstrates the kind of spatial information that can 
 
 ![](files/sample-site-2.png)
 
+# Questions and Answers
+
+Q1: **Is there a dataset which has all the years combined or would I have to concatenate the data?**
+
+Think of this as two slightly different exercises, 1) to clean-up and arrange separate data sets for the vecdyn database and 2) the analysis of these data sets. 
+
+  - 1: For the data clean up you should keep each data set as you find it, for example the Vectorbite data on zendodo is for specific years, each data-set has its own specific title indicating a specific time-frame e.g. Anastasia mosquito 2004. What you could do here is create a script that converts the 2004 data-set to the vecdyn format, then use this code to do the same for subsequent data-sets. Note that some data-sets may be assigned a unique code called a DOI  (a publishing code assigned to each published data-set). Anything with a specific title and DOI should be saved separately.
+  
+  - 2: As for your analysis, you'll probably need to combine collections together over a number of years e.g. combine all the year of Anastasia mosquito data together to create a time series analysis. 
+  
+** Also there are about 37 datasets from different locations in zenodo, but the anastasia mosquito  data goes back to 2004, while the data from other locations don't. *Would I have to combine all of these datasets together as wella nd as they are in different formats, how would I go about combining them?**
+
+Again, as mentioned in point 1 above, just keep each data-set separate e.g. by provider and year. Each data-set may vary slightly different so you may need to keep an eye on each one to see if any changes occur between years, but you will be able to use similar code for each of the data set in the Zenodo website. 
+
+**There are a lot more entries from different locations in vectorbase too and I'm not sure how to map all of these different datasets to the vecdyn template efficiently. **
+
+Sure, actually don't worry about using the data from the vectorbase website (it is a little confusing), just focus on data sets on the zenodo one.  
 
