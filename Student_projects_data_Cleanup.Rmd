@@ -224,7 +224,7 @@ The GDPP data will pose a slight challenge when converting them to the VecDyn fo
 
 # Questions and Answers
 
-*Is there a dataset which has all the years combined or would I have to concatenate the data?*
+**Is there a dataset which has all the years combined or would I have to concatenate the data?**
 
 Think of this as two slightly different exercises, 1) to clean-up and arrange separate data sets for the vecdyn database and 2) the analysis of these data sets. 
 
@@ -232,40 +232,40 @@ Think of this as two slightly different exercises, 1) to clean-up and arrange se
   
   - 2: As for your analysis, you'll probably need to combine collections together over a number of years e.g. combine all the year of Anastasia mosquito data together to create a time series analysis. 
 
-*Also there are about 37 datasets from different locations in zenodo, but the anastasia mosquito data goes back to 2004, while the data from other locations don't. Would I have to combine all of these datasets together as well and as they are in different formats, how would I go about combining them?. There are a lot more entries from different locations in vectorbase too and I'm not sure how to map all of these different datasets to the vecdyn template efficiently. *
+**Also there are about 37 datasets from different locations in zenodo, but the anastasia mosquito data goes back to 2004, while the data from other locations don't. Would I have to combine all of these datasets together as well and as they are in different formats, how would I go about combining them?. There are a lot more entries from different locations in vectorbase too and I'm not sure how to map all of these different datasets to the vecdyn template efficiently. **
 
 Don't worry about using the data from the vectorbase website (it is a little confusing). For now, just focus on data sets on the vectorbase pop bio data on the zenodo site. They are better prepared than some of the other ones on the vectorbase site i.e contain all relevant information that can be easily found. 
 
-*Could we have some definitions of the new headings? For example: I am unsure of the difference between "sampling_method" and "sampling_strategy"; *
+**Could we have some definitions of the new headings? For example: I am unsure of the difference between "sampling_method" and "sampling_strategy"; **
 
 Do you mean you want me to improve the definitions? 
 
 Definitions can be found in the section 'Data collection models'. As for data-sets you are processing, there will need to be some interpretation as to what has been done by the data collector and how this fits into our model. Just make sure you keep notes and everything can be evaluated on a cases by cases basis. 
 
-*I do not know what "value_transform" is for*
+**I do not know what "value_transform" is for**
 
 Again look under 'Data collection models', 
 
 This might be reported if the originally collected values have been transformed, the transformation method should be reported in this field. 
 
-*I am unsure of the difference of the "sample_start_date" and "sample_start_time" *
+**I am unsure of the difference of the "sample_start_date" and "sample_start_time" **
 
 One represents a data e.g. day of the year, the other an actually time 14.00. You might find that, particularly for smaller organisms that a time series might need to be created using hours rather than days. 
 
-*Should the "sample_location" be a country/county/town or more specific location in longitude/latitude?; *
+**Should the "sample_location" be a country/county/town or more specific location in longitude/latitude?; **
 
 Sample location should be a unique location, usually much more specific than a country or county, as this information is to general. However, it could be a town or something way more specific like a neighborhood in a town. 
 
-*What is the difference between the "sample_location" and "sample_collection_area"?*
+**What is the difference between the "sample_location" and "sample_collection_area"?**
 
 Sample location will be the name of a given place the sample was taken, sample collection area will be the actually area m2 of a sample location.
 Sometimes this may be represented as a geo-spatial bounding box, search on line to see what this is. 
 
-*Also, my data is missing some information that would be needed for the complete mapping, for example the publication doi and a contact email. Do I need to search for this myself*
+**Also, my data is missing some information that would be needed for the complete mapping, for example the publication doi and a contact email. Do I need to search for this myself**
 
 If you can't find it leave it blank for the moment, we can deal with it at a later date. 
 
-*Finally, how will we link the two different templates (vecdyn_template and publication_information_template)*
+**Finally, how will we link the two different templates (vecdyn_template and publication_information_template)**
 
 Good question, for the moment we'll keep the two  completed templates in separate date-frames/files, they will be linked by the actual database when  upload them. 
 
