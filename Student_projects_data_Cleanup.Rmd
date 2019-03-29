@@ -283,6 +283,7 @@ library(tidyverse)
 library(readr)
 library(plyr)
 library(scales)
+library(lubridate)
 
 ```
 
@@ -486,41 +487,83 @@ vecdyn_mcm_2012_publication_info  <-data.frame(title=character(),
 Contains functions to retrieve, organize, and visualize weather data from the NCEP/NCAR Reanalysis (http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.html) and NCEP/DOE Reanalysis II (http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis2.html) datasets. Data are queried via the Internet and may be obtained for a specified spatial and temporal extent or interpolated to a point in space and time. 
 
 ```{r}
+
+vecdyn_mcm_2012$sample_value = as.numeric(vecdyn_mcm_2012$sample_value)
+vecdyn_mcm_2012$sample_lat_dd = as.numeric(vecdyn_mcm_2012$sample_lat_dd)
+vecdyn_mcm_2012$sample_long_dd = as.numeric(vecdyn_mcm_2012$sample_long_dd)
+
+```
+
+create a time variable, lets say 3pm everyday
+
+#vecdyn_mcm_2012_2$sample_end_date = mdy_hms(vecdyn_mcm_2012_2$sample_end_date)
+
+
+```{r}
+vecdyn_mcm_2012_4pm  <- 
+  vecdyn_mcm_2012 %>%
+  dplyr::mutate(sample_end_time = "16:00:00") %>%
+  dplyr::
+
+```
+
+
+
+```{r}
+lets insert a time for everydate, say 4 oclock every day
+
+
+```
+
+
+## using lubridate
+library(lubridate)
+> ymd_hms(DateTime,tz=Sys.timezone())
+[1] "2007-02-01 EST"
+> mdy_hms(DateTime2,tz=Sys.timezone())
+[1] "2007-02-01 00:06:10 EST"
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
 # install.packages("RNCEP")
 
 library(RNCEP)
-## Ensure the vecdyn_mcm_2012 is in your global environment, if not run through the previous Mapping exercise  
-## In this example,  we use the datetime and locational data
-## obtained from the trap locations
+## Ensure the vecdyn_mcm_2012 is in your global environment, if not run through the previous Mapping exercise above
+## In this example,  we use the datetime and locational data obtained from the trap locations (gps coordinates)
 
-## First, visualize the entire track representing altitude
+## First, visualize the entire track representing 
 ## with the point colors ##
 ## Note the specification of the title
 ## Also, note the specification of the legend label
 ## and adjustment of its placement
-NCEP.vis.points(lats=gull$latitude, 
-    lons=gull$longitude, cols=topo.colors(64),
-    title.args=list(main='Lesser black-backed gull'),
-    image.plot.args=list(legend.args=list(text='Altitude',
-    adj=-1, cex=1.25)))
+NCEP.vis.points(wx=vecdyn_mcm_2012$sample_value, lats=vecdyn_mcm_2012$sample_lat_dd, 
+    lons=vecdyn_mcm_2012$sample_long_dd)
+
+```
 
 
-
-## Take a subset of the data based on the datetime of 
-## the measurement ##
-ss <- subset(gull, format(gull$datetime, "%Y-%m-%d %H:%M:%S") >=
-    "2008-09-19 16:00:00" & format(gull$datetime, 
-    "%Y-%m-%d %H:%M:%S") <= "2008-09-19 19:30:00")
-
+```{r}
 
 ## Now collect cloud cover, temperature, and wind
 ## information for each point in the subset ##
+
+temp <- NCEP.interp(variable='air.sig995', level='surface', lats=vecdyn_mcm_2012$sample_lat_dd, lons=vecdyn_mcm_2012$sample_long_dd, dt=vecdyn_mcm_2012$sample_end_date, reanalysis2=FALSE, keep.unpacking.info=TRUE)
+
+```
 cloud <- NCEP.interp(variable='tcdc.eatm', level='gaussian', 
     lat=ss$latitude, lon=ss$longitude, dt=ss$datetime, 
     reanalysis2=TRUE, keep.unpacking.info=TRUE)
-temp <- NCEP.interp(variable='air.sig995', level='surface', 
-    lat=ss$latitude, lon=ss$longitude, dt=ss$datetime,
-    reanalysis2=FALSE, keep.unpacking.info=TRUE)
+
 uwind <- NCEP.interp(variable='uwnd', level=925, 
     lat=ss$latitude, lon=ss$longitude, dt=ss$datetime,
     reanalysis2=TRUE, keep.unpacking.info=TRUE)
@@ -537,7 +580,7 @@ vwind <- NCEP.interp(variable='vwnd', level=925,
 NCEP.vis.points(wx=cloud, lats=ss$latitude, lons=ss$longitude,
     cols=rev(heat.colors(64)),
     map.args=list(col='darkgreen',xlim=c(-7,4), ylim=c(40,50)),
-    title.args=list(main='Lesser black-backed gull'),
+    title.args=list(main='Lesser black-backed vecdyn_mcm_2012'),
     image.plot.args=list(legend.args=list(text='Cloud Cover %',
         adj=-.1, padj=-.5, cex=1),
     smallplot=c(.83,.86,.15,.85)))
@@ -548,7 +591,7 @@ NCEP.vis.points(wx=cloud, lats=ss$latitude, lons=ss$longitude,
 NCEP.vis.points(wx=temp, lats=ss$latitude, lons=ss$longitude,
     cols=rev(heat.colors(64)),
     points.args=list(cex=1.25),
-    title.args=list(main='Lesser black-backed gull'),
+    title.args=list(main='Lesser black-backed vecdyn_mcm_2012'),
     image.plot.args=list(legend.args=list(text='Kelvin',
         adj=-.4, padj=-.5, cex=1.15)),
     map.args=list(xlim=c(-7,4), ylim=c(40,50)))
@@ -565,7 +608,7 @@ tailwind <- (sqrt(uwind^2 + vwind^2)*cos(((atan2(uwind,vwind)*
 NCEP.vis.points(wx=tailwind, lats=ss$latitude, lons=ss$longitude,
     cols=rev(heat.colors(64)),
     axis.args=list(las=2), grid.args=list(lty=1),
-    title.args=list(main='Lesser black-backed gull'),
+    title.args=list(main='Lesser black-backed vecdyn_mcm_2012'),
     image.plot.args=list(legend.args=list(text='Tailwind m/s',
         adj=0, padj=-2, cex=1.15)),
     map.args=list(xlim=c(-7,4), ylim=c(40,50)))
