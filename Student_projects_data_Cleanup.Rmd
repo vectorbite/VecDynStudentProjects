@@ -182,7 +182,7 @@ The following two figures demonstrates the kind of spatial information that can 
 
 ## Mapping Data to Vecdyn Template
 
-Your challenge will be to clean-up and process data-sets, mapping them to the vecdyn template. Try to map what you can, you might find that some data-sets more information than what is required for the vecdyn database (e.g. the GPDD data has many additional fields we do not need).  Work with R notebooks or rstudio markdown so you can save all your code and we can go back to it at a later date and re-edit if necessary. 
+Your challenge will be to clean-up and process data-sets, mapping them to the vecdyn template. Try to map what you can, you might find that some data-sets provide more information than what is required for the vecdyn database (e.g. the GPDD data has many additional fields we do not need).  Work with R notebooks or rstudio markdown so you can save all your code and we can go back to it at a later date and re-edit if necessary. 
 
 You'll probably need to use a number of packages and techniques to achieve your goal. You should refer to the 'R for Data Science guide'(https://r4ds.had.co.nz/) or materials you have been provided by Imperial.  
 
@@ -219,9 +219,11 @@ The GDPP data will pose a slight challenge when converting them to the VecDyn fo
     - https://www.vectorbase.org/popbio  (anything in the PopBio database)
     - https://zenodo.org/communities/vb-popbio/
     - Anastasia Mosquito Control District entomological monitoring. https://zenodo.org/communities/vb-popbio/search?page=1&size=20&q=Anastasia%20Mosquito%20Control%20District%20entomological%20monitoring
-    - Laura Harrington culex data (we will send you this in a separate email). CulexCount_Temp_Rainfall
+    - Laura Harrington culex data (we will send you this in a separate email). CulexCount_Temp_Rainfall  
 
-
+Download the entire vectorbase popbio database here
+    - https://imperiallondon-my.sharepoint.com/:f:/g/personal/mwatts_ic_ac_uk/ElBCZN-hJtlKoM-N5R7SDnUBe9vLkrhhXtkJ-IEjjLmPMA?e=lR86y4
+    
 # Questions and Answers
 
 **Is there a dataset which has all the years combined or would I have to concatenate the data?**
@@ -483,8 +485,27 @@ vecdyn_mcm_2012_publication_info  <-data.frame(title=character(),
 
 ### Linking Vecdyn Data To Climate Data
 
+Run through the above tutorial to import all the data for the next steps. 
+
+```{r}
+
+# install.packages("RNCEP")
+# install.packages("tidyverse")
+# install.packages("readr")
+# install.packages("plyr")
+# install.packages("scales")
+library(RNCEP)
+library(tidyverse)
+library(readr)
+library(plyr)
+library(scales)
+library(lubridate)
+```
+
 ## RNCEP: Obtain, Organize, and Visualize NCEP Weather Data
-Contains functions to retrieve, organize, and visualize weather data from the NCEP/NCAR Reanalysis (http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.html) and NCEP/DOE Reanalysis II (http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis2.html) datasets. Data are queried via the Internet and may be obtained for a specified spatial and temporal extent or interpolated to a point in space and time. 
+This package contains functions that retrieve, organize, and visualize weather data from the NCEP/NCAR Reanalysis (http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.html) and NCEP/DOE Reanalysis II (http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis2.html) datasets. Data are queried via the Internet and may be obtained for a specified spatial and temporal extent or interpolated to a point in space and time. 
+
+For this package, we need to convert the relevent data to numerical format. 
 
 ```{r}
 
@@ -492,127 +513,328 @@ vecdyn_mcm_2012$sample_value = as.numeric(vecdyn_mcm_2012$sample_value)
 vecdyn_mcm_2012$sample_lat_dd = as.numeric(vecdyn_mcm_2012$sample_lat_dd)
 vecdyn_mcm_2012$sample_long_dd = as.numeric(vecdyn_mcm_2012$sample_long_dd)
 
+# take a sub sample just for the purpose of this tutorial i.e. quicker processing speed
+vecdyn_mcm_2012 <- dplyr::filter(vecdyn_mcm_2012, sample_location == "Mullins")
 ```
 
-create a time variable, lets say 3pm everyday
+Unfortunately the RNCEP doesnt allow us (as far as i know) to extract daily averages based on dates alone, we can only extract values at particular date times to try to give us a representive indication of the temperature / rainfall that day. We need to create sampling points spread throughout the day to get daily averages from the NCEP/NCAR Reanalysis dataset. 
 
-#vecdyn_mcm_2012_2$sample_end_date = mdy_hms(vecdyn_mcm_2012_2$sample_end_date)
+With this dataset, a sample start and end date is provided. lets extarct values beginning from the start data and ending at the end date over a 24 hour period. 
 
+Create a time variable, starting at 00.01 everyday, then every 6 hours. 
 
 ```{r}
-vecdyn_mcm_2012_4pm  <- 
+vecdyn_mcm_2012_00  <- 
   vecdyn_mcm_2012 %>%
-  dplyr::mutate(sample_end_time = "16:00:00") %>%
-  dplyr::
+  dplyr::select(sample_start_date, sample_lat_dd, sample_long_dd) %>%
+  dplyr::distinct() %>%
+  dplyr::mutate(sample_start_time = "00:00:01") %>%
+  dplyr::mutate(sample_start_datetime = sample_start_date) %>%
+  tidyr::unite("sample_start_datetime", c("sample_start_date","sample_start_time"), sep = " ", remove = FALSE) %>%
+  dplyr::mutate(sample_start_datetime  = as.POSIXct(sample_start_datetime , format = "%Y-%m-%d%H:%M:%S"))
+
+vecdyn_mcm_2012_06  <- 
+  vecdyn_mcm_2012 %>%
+  dplyr::select(sample_start_date, sample_lat_dd, sample_long_dd) %>%
+  dplyr::distinct() %>%
+  dplyr::mutate(sample_start_time = "06:00:01") %>%
+  dplyr::mutate(sample_start_datetime = sample_start_date) %>%
+  tidyr::unite("sample_start_datetime", c("sample_start_date","sample_start_time"), sep = " ", remove = FALSE) %>%
+  dplyr::mutate(sample_start_datetime  = as.POSIXct(sample_start_datetime , format = "%Y-%m-%d%H:%M:%S"))
+
+vecdyn_mcm_2012_12  <- 
+  vecdyn_mcm_2012 %>%
+  dplyr::select(sample_start_date, sample_lat_dd, sample_long_dd) %>%
+  dplyr::distinct() %>%
+  dplyr::mutate(sample_start_time = "12:00:01") %>%
+  dplyr::mutate(sample_start_datetime = sample_start_date) %>%
+  tidyr::unite("sample_start_datetime", c("sample_start_date","sample_start_time"), sep = " ", remove = FALSE) %>%
+  dplyr::mutate(sample_start_datetime  = as.POSIXct(sample_start_datetime , format = "%Y-%m-%d%H:%M:%S"))
+
+vecdyn_mcm_2012_18  <- 
+  vecdyn_mcm_2012 %>%
+  dplyr::select(sample_start_date, sample_lat_dd, sample_long_dd) %>%
+  dplyr::distinct() %>%
+  dplyr::mutate(sample_start_time = "18:00:01") %>%
+  dplyr::mutate(sample_start_datetime = sample_start_date) %>%
+  tidyr::unite("sample_start_datetime", c("sample_start_date","sample_start_time"), sep = " ", remove = FALSE) %>%
+  dplyr::mutate(sample_start_datetime  = as.POSIXct(sample_start_datetime , format = "%Y-%m-%d%H:%M:%S"))
+
+vecdyn_mcm_2012_all <- rbind(vecdyn_mcm_2012_00,vecdyn_mcm_2012_06,vecdyn_mcm_2012_12,vecdyn_mcm_2012_18)
+
+vecdyn_mcm_2012_all <- data.frame(vecdyn_mcm_2012_all)
 
 ```
 
 
-
-```{r}
-lets insert a time for everydate, say 4 oclock every day
-
-
-```
-
-
-## using lubridate
-library(lubridate)
-> ymd_hms(DateTime,tz=Sys.timezone())
-[1] "2007-02-01 EST"
-> mdy_hms(DateTime2,tz=Sys.timezone())
-[1] "2007-02-01 00:06:10 EST"
-
-
-
-
-
-
-
-
-
-
-
-
-```{r}
-# install.packages("RNCEP")
-
-library(RNCEP)
-## Ensure the vecdyn_mcm_2012 is in your global environment, if not run through the previous Mapping exercise above
-## In this example,  we use the datetime and locational data obtained from the trap locations (gps coordinates)
-
-## First, visualize the entire track representing 
-## with the point colors ##
-## Note the specification of the title
-## Also, note the specification of the legend label
-## and adjustment of its placement
-NCEP.vis.points(wx=vecdyn_mcm_2012$sample_value, lats=vecdyn_mcm_2012$sample_lat_dd, 
-    lons=vecdyn_mcm_2012$sample_long_dd)
-
-```
-
+In this example,  we use the datetime and locational data obtained from the trap locations (gps coordinates)
 
 ```{r}
 
 ## Now collect cloud cover, temperature, and wind
 ## information for each point in the subset ##
 
-temp <- NCEP.interp(variable='air.sig995', level='surface', lats=vecdyn_mcm_2012$sample_lat_dd, lons=vecdyn_mcm_2012$sample_long_dd, dt=vecdyn_mcm_2012$sample_end_date, reanalysis2=FALSE, keep.unpacking.info=TRUE)
+vecdyn_mcm_2012_all$temp <- NCEP.interp(variable='air.sig995', level='surface', lat=vecdyn_mcm_2012_all$sample_lat_dd, lon=vecdyn_mcm_2012_all$sample_long_dd, dt=vecdyn_mcm_2012_all$sample_start_datetime, reanalysis2=FALSE, keep.unpacking.info=TRUE)
 
 ```
-cloud <- NCEP.interp(variable='tcdc.eatm', level='gaussian', 
-    lat=ss$latitude, lon=ss$longitude, dt=ss$datetime, 
-    reanalysis2=TRUE, keep.unpacking.info=TRUE)
+We now have temperature data for each trap site at a particualr datetime. Note that we filtered sample_location == "Mullins" so we don't have all the trap locations in this subset of data. But if you didn't filter that location you'd end up with all trap locations and dates within the data-set. 
 
-uwind <- NCEP.interp(variable='uwnd', level=925, 
-    lat=ss$latitude, lon=ss$longitude, dt=ss$datetime,
-    reanalysis2=TRUE, keep.unpacking.info=TRUE)
-vwind <- NCEP.interp(variable='vwnd', level=925, 
-    lat=ss$latitude, lon=ss$longitude, dt=ss$datetime, 
-    reanalysis2=TRUE, keep.unpacking.info=TRUE)	
+Next lets take an average of the 6 hourly daily climate data creating a daily average
 
-## Now visualize the subset of the GPS track using color
-## to indicate the cloud cover ##
-## Note the adjustment to the color of the basemap
-## And the setting of the map range ##
-## And the explicit placement of the colorbar legend
-## using the smallplot argument
-NCEP.vis.points(wx=cloud, lats=ss$latitude, lons=ss$longitude,
-    cols=rev(heat.colors(64)),
-    map.args=list(col='darkgreen',xlim=c(-7,4), ylim=c(40,50)),
-    title.args=list(main='Lesser black-backed vecdyn_mcm_2012'),
-    image.plot.args=list(legend.args=list(text='Cloud Cover %',
-        adj=-.1, padj=-.5, cex=1),
-    smallplot=c(.83,.86,.15,.85)))
-
-## Now visualize the subset of the GPS track using color
-## to indicate the temperature ##
-## Note the adjustment of point size
-NCEP.vis.points(wx=temp, lats=ss$latitude, lons=ss$longitude,
-    cols=rev(heat.colors(64)),
-    points.args=list(cex=1.25),
-    title.args=list(main='Lesser black-backed vecdyn_mcm_2012'),
-    image.plot.args=list(legend.args=list(text='Kelvin',
-        adj=-.4, padj=-.5, cex=1.15)),
-    map.args=list(xlim=c(-7,4), ylim=c(40,50)))
-
-## Now calculate the tailwind component from the U and V
-## wind components assuming that the bird's preferred 
-## direction is 225 degrees
-tailwind <- (sqrt(uwind^2 + vwind^2)*cos(((atan2(uwind,vwind)*
-    (180/pi))-225)*(pi/180)))
-
-## Now visualize the subset of the GPS track using color
-## to indicate the tailwind speed ##
-## Note the adjustment of grid and axis properties
-NCEP.vis.points(wx=tailwind, lats=ss$latitude, lons=ss$longitude,
-    cols=rev(heat.colors(64)),
-    axis.args=list(las=2), grid.args=list(lty=1),
-    title.args=list(main='Lesser black-backed vecdyn_mcm_2012'),
-    image.plot.args=list(legend.args=list(text='Tailwind m/s',
-        adj=0, padj=-2, cex=1.15)),
-    map.args=list(xlim=c(-7,4), ylim=c(40,50)))
-
-## End(Not run)
+```{r}
+vecdyn_mcm_2012_av_daily_temp <-
+vecdyn_mcm_2012_all %>% 
+  dplyr::group_by(sample_lat_dd, sample_long_dd, sample_start_date) %>%
+  dplyr::summarise(avg_temp = mean(temp))
 ```
 
+and now lets create a query that merges  the temp data we just gathered back into the main data set
+
+```{r}
+vecdyn_mcm_2012_with_temps <- 
+  dplyr::inner_join(vecdyn_mcm_2012, vecdyn_mcm_2012_av_daily_temp, by = c("sample_lat_dd" = "sample_lat_dd","sample_long_dd" = "sample_long_dd", "sample_start_date"="sample_start_date"))
+```
+
+https://cran.r-project.org/web/packages/RNCEP/RNCEP.pdf
+You can also repeat the steps for the relative humidity (‘rhum.sig995’ Relative Humidity), which can be used as a proxy for rainfall. 
+
+### Data-sets that do not provide GPS trap coordinates. 
+
+You may find that some data-sets do not provide GPS trap coordinates,  which presents us with a problem. This is the case for the KBS049:Aphid Collection Tower KBS data. At the time of writing, i'm still waiting for the lead contact to reply to me regarding where we can source spatial data to compliment this data-set.  
+
+However, we can still use the date-set by linking the sample location sites with the Census.gov US Cartographic Boundary Shapefiles. You can download this data-set here.  https://www.census.gov/geo/maps-data/data/cbf/cbf_ua.html.  
+
+Download the 2010 Census zip file, unzip and place the unzipped folder into VecDynStudentProjects/files/  
+
+You will need to install the following packages for the next steps. 
+
+```{r}
+# install.packages("sf")
+# install.packages("tmap")
+# install.packages("lwgeom")
+# install.packages("RNCEP")
+# install.packages("tidyverse")
+# install.packages("readr")
+# install.packages("plyr")
+# install.packages("scales")
+# install.packages("tibbletime")
+library(RNCEP)
+library(tidyverse)
+library(readr)
+library(plyr)
+library(scales)
+library(lubridate)
+library(sf)
+library(tmap)
+library(lwgeom)
+library(readr)
+library(tibbletime)
+```
+
+If you are using ubuntu you may need to install the following packages before you can use the spatial packages:   
+
+- sudo apt install libudunits2-dev  
+- sudo apt-get install libgdal-dev
+- sudo apt install libgeos++-dev
+- sudo apt-get install liblwgeom-2.3-0
+- sudo apt-get install libcairo2-dev
+
+Load up the us_census dataset which contains shape files that match geo data in the KBS data-set
+
+```{r}
+us_census_sites <- st_read("./files/cb_2012_us_uac10_500k/cb_2012_us_uac10_500k.shp")
+```
+we don't need all the information in the US cencus data-set so lets only keep the necesary columns
+
+```{r}
+us_census_sites <- dplyr::select(us_census_sites, NAME10, geometry)
+
+```
+
+Let's take a look at the us_census data. Each grey shape represents a small urban area, we'll use these shapefiles to capture climate data. If you look in the data frame you'll see that each place name correspeonds to spatial infomration captured in the geometry column
+
+```{r}
+tm_shape(us_census_sites, ylim = c(20,50), xlim = c(-130,-65)) +
+    tm_polygons()
+
+```
+
+
+Download the KBS aphid data-set here
+
+https://lter.kbs.msu.edu/datatables/122.csv
+
+You'll first need to edit it approriately in excel or equivlent to get it into the right format. 
+
+```{r}
+
+KBSaphid <- read_csv("./files/122-aphid+colonization+via+suction+traps.csv")
+```
+
+You'll next need to join the two data-sets together using the place names, the naming format differs in each data-set, so we'll need to do some formatting first. We will also create a data frame of distinct locations.
+
+```{r}
+
+KBSaphid_collection_sites <- 
+  KBSaphid  %>%
+  tidyr::unite("sample_location", c("station","state"), sep = ", ", remove = FALSE) %>%
+  dplyr::select(sample_location) %>%
+  dplyr::distinct()
+  
+```
+
+Next lets create a query so we can give the KBSaphid collection stations spatial information 
+
+```{r}
+
+KBSaphid_collection_sites_sp <- dplyr::inner_join(us_census_sites, KBSaphid_collection_sites, by = c("NAME10" = "sample_location"))
+
+```
+
+The query only captured spatial information for 14 stations out of a possible 41, however this is enough to work with for now. 
+
+We can take a look to see what we captured from the us_census dataset. It is a bit difficult to see anything if we try to look at them all together since the geographical areas are so small. But these spatial entities are now connected to the KBSaphid sample stations. 
+```{r}
+tm_shape(KBSaphid_collection_sites_sp, ylim = c(20,50), xlim = c(-130,-65)) +
+    tm_polygons()
+```
+
+Ok, next we need to create spatial points which will capture climate information within each of the 14 station.
+
+We generate 50 points, these are randomly distributed within each station shape, however the provision of points is dependent on the the station shape size. Larger areas get more points. Note that we should use as many sample points as possible to represent the station,  but we'll be restricted by memory and processing time so we'll keep this tutorial simple.
+
+```{r}
+
+
+sample_points <- st_sample(KBSaphid_collection_sites_sp, 50) %>% # random points, as a list ...
+  st_sf()  # ... to data frame ...
+
+```
+
+Ok, so lets have a look what we have done. 
+If we filter KBSaphid_collection_sites_sp and choose one sampling station we can see that we have a shape file representing the area of the station where the aphids were sampled. We randomly asigned points to the area which we will use to extract climate information. 
+
+```{r}
+t <- dplyr::filter(KBSaphid_collection_sites_sp, NAME10 == "Manhattan, KS")
+  
+tm_shape(t) +
+    tm_polygons() +
+  tm_shape(sample_points) +
+      tm_dots()
+
+```
+Now lets re-join our random sample points back to our station names. 
+
+```{r}
+climate_sampling_points <- st_join(sample_points, KBSaphid_collection_sites_sp, join = st_intersects)
+```
+
+The next thing we want to do is join the 'sample points' back to the main data-set.
+
+We first need to create a  dataset of unique sample sites and dates
+
+```{r}
+
+KBSaphid_collection_sites_dates <- 
+  KBSaphid  %>%
+  tidyr::unite("sample_location", c("station","state"), sep = ", ", remove = FALSE) %>%
+  dplyr::select(sample_date, sample_location) %>%
+  dplyr::distinct()
+  
+```
+
+Now lets query this with the climate sample points we made for each sample_location. 
+
+```{r}
+KBSaphid_collection_sites_dates_with_random_points <- dplyr::inner_join(climate_sampling_points, KBSaphid_collection_sites_dates, by = c("NAME10" = "sample_location"))
+
+```
+Now if you look at the KBSaphid_collection_sites_dates_with_random_points, you will see that we have all of the dates in the orginal study along with random points we created from the station shapes.  
+
+Next we want to spread the sampling dates out through the day. So we can repeat something similar to what we did with the mosquito data. 
+
+create a time variable, starting at 00.01, then every 6 hours. 
+
+
+```{r}
+KBSaphid_collection_sites_dates_with_random_points_00  <- 
+  KBSaphid_collection_sites_dates_with_random_points %>%
+  dplyr::select(sample_date, NAME10, geometry) %>%
+  dplyr::mutate(sample_time = "00:00:01") %>%
+  tidyr::unite("sample_datetime", c("sample_date","sample_time"), sep = " ", remove = FALSE) %>%
+  dplyr::mutate(sample_datetime = as.POSIXct(sample_datetime, format = "%Y-%m-%d%H:%M:%S"))
+
+KBSaphid_collection_sites_dates_with_random_points_06  <- 
+  KBSaphid_collection_sites_dates_with_random_points %>%
+  dplyr::select(sample_date, NAME10, geometry) %>%
+  dplyr::mutate(sample_time = "06:00:01") %>%
+  tidyr::unite("sample_datetime", c("sample_date","sample_time"), sep = " ", remove = FALSE) %>%
+  dplyr::mutate(sample_datetime = as.POSIXct(sample_datetime, format = "%Y-%m-%d%H:%M:%S"))
+
+KBSaphid_collection_sites_dates_with_random_points_12  <- 
+  KBSaphid_collection_sites_dates_with_random_points %>%
+  dplyr::select(sample_date, NAME10, geometry) %>%
+  dplyr::mutate(sample_time = "12:00:01") %>%
+  tidyr::unite("sample_datetime", c("sample_date","sample_time"), sep = " ", remove = FALSE) %>%
+  dplyr::mutate(sample_datetime = as.POSIXct(sample_datetime, format = "%Y-%m-%d%H:%M:%S"))
+
+KBSaphid_collection_sites_dates_with_random_points_18  <- 
+  KBSaphid_collection_sites_dates_with_random_points %>%
+  dplyr::select(sample_date, NAME10, geometry) %>%
+  dplyr::mutate(sample_time = "18:00:01") %>%
+  tidyr::unite("sample_datetime", c("sample_date","sample_time"), sep = " ", remove = FALSE) %>%
+  dplyr::mutate(sample_datetime = as.POSIXct(sample_datetime, format = "%Y-%m-%d%H:%M:%S"))
+
+KBSaphid_all <- rbind(KBSaphid_collection_sites_dates_with_random_points_00,KBSaphid_collection_sites_dates_with_random_points_06,KBSaphid_collection_sites_dates_with_random_points_12, KBSaphid_collection_sites_dates_with_random_points_18)
+
+```
+
+Now we are ready to retrieve information to our KBSaphid_all points and time data frame.  However, we need to reformat the spatial information for the RNCEP package. by turning the geomerty column into individual points. 
+
+
+```{r}
+
+##create a function that allows us to converts spatial point data to points
+sfc_as_cols <- function(x, names = c("x","y")) {
+  stopifnot(inherits(x,"sf") && inherits(sf::st_geometry(x),"sfc_POINT"))
+  ret <- sf::st_coordinates(x)
+  ret <- tibble::as_tibble(ret)
+  stopifnot(length(names) == ncol(ret))
+  x <- x[ , !names(x) %in% names]
+  ret <- setNames(ret,names)
+  dplyr::bind_cols(x,ret)
+}
+
+KBSaphid_all <- sfc_as_cols(KBSaphid_all)
+
+
+
+```
+lets take a subset of the data merely for processing purposes, otherwise it will take all day
+```{r}
+KBSaphid_all_no_geom <- 
+  KBSaphid_all %>%
+  dplyr::mutate(sample_date = as.Date(sample_date, format = "%Y-%m-%d")) %>%
+  st_set_geometry(NULL) %>%
+  distinct()
+
+KBSaphid_Monroe <- dplyr::filter(KBSaphid_all_no_geom, NAME10 == "Monroe, MI", )
+ 
+```
+
+```{r}
+
+## Now collect cloud cover, temperature, and wind
+## information for each point in the subset ##
+
+KBSaphid_Monroe$temp <- NCEP.interp(variable='air.sig995', level='surface', lat=KBSaphid_Monroe$y, lon=KBSaphid_Monroe$x, dt=KBSaphid_Monroe$sample_datetime, reanalysis2=FALSE, keep.unpacking.info=TRUE)
+
+```
+
+Next you want to take an average of all the tempertaure samples, 
+https://cran.r-project.org/web/packages/RNCEP/RNCEP.pdf
+You can also repeat the steps for the relative humidity (‘rhum.sig995’ Relative Humidity), which can be used as a proxy for rainfall. 
+
+Once you have download all the required data per sample location and time, you can average them by place name and date to get all the desired climate
+
+You can then requery this with the original data set to get all the climate variables. 
