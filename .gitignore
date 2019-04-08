@@ -1,5 +1,6 @@
+*
+!.gitignore
+!*.png
+!*.Rmd
+!*.pdf
 .Rproj.user
-.Rhistory
-.RData
-.Ruserdata
-.html

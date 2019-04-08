@@ -28,14 +28,13 @@ Along with the time series data, we need minimal amounts of information,  that c
 
 ### General information about the VecDyn template
 
-VecDyn data is stored in two separate files, one dedicated for storing publication information,  one dedicated for storing time-series data and meta-data (data describing how the data was collected).  Data-sets come in many forms, you may receive a data-set which contains all relevant data in one file or one that is split into several files or sources i.e. publication information from a web page and time series data from a file. 
+VecDyn data is stored in two separate files, one dedicated for storing publication information,  one dedicated for storing time-series data and meta-data (data describing how the data was collected).  Data-sets come in many forms, you may receive a data-set which contains all relevant data in one file or one that is split into several files or sources i.e. publication information from a web page and time series data from a file.
 
 You may find that you can complete each table partially and you end up with missing fields. You can refer to the 'Data collection models' section below which lists which fields are required.  If you have any doubts we can decide if the data-set is complete at a later date and even request information from the author if required. 
 
 ### Template 
 
 Note that all data frame fields are created in character format,  you'll need to convert them to the correct formats at a later stage. You can use this data frame as a guide to help you convert your data-set to the VecDyn format. You can either import data into into the data frames below or just rename the field names of the data-set you are working on.  However,  you need to make sure all the columns are in the correct order as below,  even if your data set is missing certain fields. In this case you need to create them  and leave them blank. 
-
 
 ```{r}
 publication_information_template  <-data.frame(title=character(), 
@@ -93,7 +92,6 @@ vecdyn_template  <- data.frame(title = character(),
 #write.csv(VecDyn_template, file = "VecDyn_template.csv", row.names = FALSE)
                              
 ```
-
 
 ### Data collection models 
 
@@ -169,20 +167,13 @@ In order to facilitate mapping and geo-spatial analysis, spatial referencing has
 
 The following two figures demonstrates the kind of spatial information that can be captured in the database. 
 
-
-
-
 ![](files/sample-site-1.png)
-
-
-
-
 
 ![](files/sample-site-2.png)
 
 ## Mapping Data to Vecdyn Template
 
-Your challenge will be to clean-up and process data-sets, mapping them to the vecdyn template. Try to map what you can, you might find that some data-sets provide more information than what is required for the vecdyn database (e.g. the GPDD data has many additional fields we do not need).  Work with R notebooks or rstudio markdown so you can save all your code and we can go back to it at a later date and re-edit if necessary. 
+Your challenge will be to clean-up and process data-sets, mapping them to the vecdyn template. Try to map what you can, you might find that some data-sets provide more information than what is required for the vecdyn database (e.g. the GPDD data has many additional fields we do not need).  Work with R notebooks or r studio markdown so you can save all your code and we can go back to it at a later date and re-edit if necessary. 
 
 You'll probably need to use a number of packages and techniques to achieve your goal. You should refer to the 'R for Data Science guide'(https://r4ds.had.co.nz/) or materials you have been provided by Imperial.  
 
@@ -221,7 +212,8 @@ The GDPP data will pose a slight challenge when converting them to the VecDyn fo
     - Anastasia Mosquito Control District entomological monitoring. https://zenodo.org/communities/vb-popbio/search?page=1&size=20&q=Anastasia%20Mosquito%20Control%20District%20entomological%20monitoring
     - Laura Harrington culex data (we will send you this in a separate email). CulexCount_Temp_Rainfall  
 
-Download the entire vectorbase popbio database here
+Download the entire Vectorbase PopBio database here, this database contains lots of mosquito data-sets from around the world. There are two files in this folder, one which contains the main data and another publication information and metadata. You can connect them together using the shared ID codes.
+
     - https://imperiallondon-my.sharepoint.com/:f:/g/personal/mwatts_ic_ac_uk/ElBCZN-hJtlKoM-N5R7SDnUBe9vLkrhhXtkJ-IEjjLmPMA?e=lR86y4
     
 # Questions and Answers
@@ -230,13 +222,13 @@ Download the entire vectorbase popbio database here
 
 Think of this as two slightly different exercises, 1) to clean-up and arrange separate data sets for the vecdyn database and 2) the analysis of these data sets. 
 
-  - 1: For the data clean up you should keep each data set as you find it, for example the Vectorbite data on zenodo is for specific years, each data-set has its own specific title indicating a specific time-frame e.g. Anastasia mosquito 2004. What you could do here is create a script that converts the 2004 data-set to the vecdyn format, then use this code to do the same for subsequent data-sets. Note that some data-sets may be assigned a unique code called a DOI  (a publishing code assigned to each published data-set). Anything with a specific title and DOI should be saved / processed separately.
+  - 1: For the data clean up you should keep each data set as you find it, for example the Vectorbite data on Zenodo is for specific years, each data-set has its own specific title indicating a specific time-frame e.g. Anastasia mosquito 2004. What you could do here is create a script that converts the 2004 data-set to the vecdyn format, then use this code to do the same for subsequent data-sets. Note that some data-sets may be assigned a unique code called a DOI  (a publishing code assigned to each published data-set). Anything with a specific title and DOI should be saved / processed separately.
   
   - 2: As for your analysis, you'll probably need to combine collections together over a number of years e.g. combine all the year of Anastasia mosquito data together to create a time series analysis. 
 
 **Also there are about 37 datasets from different locations in zenodo, but the anastasia mosquito data goes back to 2004, while the data from other locations don't. Would I have to combine all of these datasets together as well and as they are in different formats, how would I go about combining them?. There are a lot more entries from different locations in vectorbase too and I'm not sure how to map all of these different datasets to the vecdyn template efficiently. **
 
-Don't worry about using the data from the vectorbase website (it is a little confusing). For now, just focus on data sets on the vectorbase pop bio data on the zenodo site. They are better prepared than some of the other ones on the vectorbase site i.e contain all relevant information that can be easily found. 
+Don't worry about using the data from the Vectorbase website (it is a little confusing). For now, just focus on data sets on the vectorbase pop bio data on the zenodo site. They are better prepared than some of the other ones on the vectorbase site i.e contain all relevant information that can be easily found. 
 
 **Could we have some definitions of the new headings? For example: I am unsure of the difference between "sampling_method" and "sampling_strategy"; **
 
@@ -428,7 +420,6 @@ vecdyn_mcm_2012 <-
 
 Test the data set by producing a time series plot in from our newly created vecdyn data-set and compare it using ggplot. Note that this particular data set contains lots of sampling stations within manatee_county. 
 
-
 ```{r}
 vecdyn_mcm_2012  %>%
   dplyr::filter(taxon == "Aedes aegypti")  %>%
@@ -503,9 +494,9 @@ library(lubridate)
 ```
 
 ## RNCEP: Obtain, Organize, and Visualize NCEP Weather Data
-This package contains functions that retrieve, organize, and visualize weather data from the NCEP/NCAR Reanalysis (http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.html) and NCEP/DOE Reanalysis II (http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis2.html) datasets. Data are queried via the Internet and may be obtained for a specified spatial and temporal extent or interpolated to a point in space and time. 
+This package contains functions that retrieve, organize, and visualize weather data from the NCEP/NCAR Reanalysis (http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.html) and NCEP/DOE Reanalysis II (http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis2.html) data-sets. Data are queried via the Internet and may be obtained for a specified spatial and temporal extent or interpolated to a point in space and time. 
 
-For this package, we need to convert the relevent data to numerical format. 
+For this package, we need to convert the relevant data to numerical format. 
 
 ```{r}
 
@@ -517,9 +508,9 @@ vecdyn_mcm_2012$sample_long_dd = as.numeric(vecdyn_mcm_2012$sample_long_dd)
 vecdyn_mcm_2012 <- dplyr::filter(vecdyn_mcm_2012, sample_location == "Mullins")
 ```
 
-Unfortunately the RNCEP doesnt allow us (as far as i know) to extract daily averages based on dates alone, we can only extract values at particular date times to try to give us a representive indication of the temperature / rainfall that day. We need to create sampling points spread throughout the day to get daily averages from the NCEP/NCAR Reanalysis dataset. 
+Unfortunately the RNCEP doesnt allow us (as far as i know) to extract daily averages based on dates and point locations alone, we can only extract values at particular date-times to try to give us a representative indication of the temperature / rainfall that day. Therefore, we need to create sampling points spread throughout the day to get daily averages. 
 
-With this dataset, a sample start and end date is provided. lets extarct values beginning from the start data and ending at the end date over a 24 hour period. 
+With this data-set, a sample start and end date is provided. Lets extract values beginning from the start date and ending at the end date over a 24 hour period. It would best best to extract hourly data points, however, for the sake of this tutorial we will extract climate data at 6 hour intervals. 
 
 Create a time variable, starting at 00.01 everyday, then every 6 hours. 
 
@@ -566,8 +557,7 @@ vecdyn_mcm_2012_all <- data.frame(vecdyn_mcm_2012_all)
 
 ```
 
-
-In this example,  we use the datetime and locational data obtained from the trap locations (gps coordinates)
+In this example,  we use the date-time and location data obtained from the trap locations (gps coordinates)
 
 ```{r}
 
@@ -577,7 +567,8 @@ In this example,  we use the datetime and locational data obtained from the trap
 vecdyn_mcm_2012_all$temp <- NCEP.interp(variable='air.sig995', level='surface', lat=vecdyn_mcm_2012_all$sample_lat_dd, lon=vecdyn_mcm_2012_all$sample_long_dd, dt=vecdyn_mcm_2012_all$sample_start_datetime, reanalysis2=FALSE, keep.unpacking.info=TRUE)
 
 ```
-We now have temperature data for each trap site at a particualr datetime. Note that we filtered sample_location == "Mullins" so we don't have all the trap locations in this subset of data. But if you didn't filter that location you'd end up with all trap locations and dates within the data-set. 
+
+We now have temperature data for each trap site at a particular date-time. Note that we filtered sample_location == "Mullins" so we only extract values for a limited number of the trap locations.
 
 Next lets take an average of the 6 hourly daily climate data creating a daily average
 
@@ -588,7 +579,7 @@ vecdyn_mcm_2012_all %>%
   dplyr::summarise(avg_temp = mean(temp))
 ```
 
-and now lets create a query that merges  the temp data we just gathered back into the main data set
+And now lets create a query that merges the temp data we just gathered back into the main data set.
 
 ```{r}
 vecdyn_mcm_2012_with_temps <- 
@@ -600,9 +591,9 @@ You can also repeat the steps for the relative humidity (‘rhum.sig995’ Relat
 
 ### Data-sets that do not provide GPS trap coordinates. 
 
-You may find that some data-sets do not provide GPS trap coordinates,  which presents us with a problem. This is the case for the KBS049:Aphid Collection Tower KBS data. At the time of writing, i'm still waiting for the lead contact to reply to me regarding where we can source spatial data to compliment this data-set.  
+You may find that some data-sets do not provide GPS coordinates for trap station sites  which presents us with a problem. This is the case for the KBS049:Aphid Collection Tower KBS data. At the time of writing, I'm still waiting for the lead contact to reply to me regarding where we can source spatial data to compliment this data-set.  
 
-However, we can still use the date-set by linking the sample location sites with the Census.gov US Cartographic Boundary Shapefiles. You can download this data-set here.  https://www.census.gov/geo/maps-data/data/cbf/cbf_ua.html.  
+However, we can still use the date-set by linking the station location sites with the Census.gov US Cartographic Boundary Shape files. You can download this data-set here.  https://www.census.gov/geo/maps-data/data/cbf/cbf_ua.html.  
 
 Download the 2010 Census zip file, unzip and place the unzipped folder into VecDynStudentProjects/files/  
 
@@ -631,7 +622,7 @@ library(readr)
 library(tibbletime)
 ```
 
-If you are using ubuntu you may need to install the following packages before you can use the spatial packages:   
+If you are using Ubuntu you may need to install the following packages before you can use the spatial packages:   
 
 - sudo apt install libudunits2-dev  
 - sudo apt-get install libgdal-dev
@@ -639,19 +630,20 @@ If you are using ubuntu you may need to install the following packages before yo
 - sudo apt-get install liblwgeom-2.3-0
 - sudo apt-get install libcairo2-dev
 
-Load up the us_census dataset which contains shape files that match geo data in the KBS data-set
+Load up the us_census data-set which contains shape files that match geo data in the KBS data-set
 
 ```{r}
 us_census_sites <- st_read("./files/cb_2012_us_uac10_500k/cb_2012_us_uac10_500k.shp")
 ```
-we don't need all the information in the US cencus data-set so lets only keep the necesary columns
+
+We don't need all the information in the US census data-set so lets only keep the necessary columns
 
 ```{r}
 us_census_sites <- dplyr::select(us_census_sites, NAME10, geometry)
 
 ```
 
-Let's take a look at the us_census data. Each grey shape represents a small urban area, we'll use these shapefiles to capture climate data. If you look in the data frame you'll see that each place name correspeonds to spatial infomration captured in the geometry column
+Let's take a look at the us_census data. Each grey shape represents a small urban area, we'll use these shape files to capture climate data. If you look in the data frame you'll see that each place name corresponds to spatial information captured in the geometry column
 
 ```{r}
 tm_shape(us_census_sites, ylim = c(20,50), xlim = c(-130,-65)) +
@@ -659,31 +651,39 @@ tm_shape(us_census_sites, ylim = c(20,50), xlim = c(-130,-65)) +
 
 ```
 
-
 Download the KBS aphid data-set here
 
 https://lter.kbs.msu.edu/datatables/122.csv
 
-You'll first need to edit it approriately in excel or equivlent to get it into the right format. 
+You'll first need to edit it appropriately in excel or equivalent to get it into the right format. 
 
 ```{r}
 
 KBSaphid <- read_csv("./files/122-aphid+colonization+via+suction+traps.csv")
 ```
 
-You'll next need to join the two data-sets together using the place names, the naming format differs in each data-set, so we'll need to do some formatting first. We will also create a data frame of distinct locations.
+You'll next need to join the two data-sets together using the place names, the naming format differs in each data-set, so we'll need to do some formatting first. 
+
+```{r}
+
+KBSaphid <- 
+  KBSaphid  %>%
+  tidyr::unite("sample_location", c("station","state"), sep = ", ", remove = FALSE)
+  
+```
+
+We will also create a data frame of distinct locations.
 
 ```{r}
 
 KBSaphid_collection_sites <- 
   KBSaphid  %>%
-  tidyr::unite("sample_location", c("station","state"), sep = ", ", remove = FALSE) %>%
   dplyr::select(sample_location) %>%
   dplyr::distinct()
   
 ```
 
-Next lets create a query so we can give the KBSaphid collection stations spatial information 
+Next lets create a query so we can join the KBSaphid collection stations data and us_census spatial information 
 
 ```{r}
 
@@ -693,26 +693,26 @@ KBSaphid_collection_sites_sp <- dplyr::inner_join(us_census_sites, KBSaphid_coll
 
 The query only captured spatial information for 14 stations out of a possible 41, however this is enough to work with for now. 
 
-We can take a look to see what we captured from the us_census dataset. It is a bit difficult to see anything if we try to look at them all together since the geographical areas are so small. But these spatial entities are now connected to the KBSaphid sample stations. 
+We can take a look to see what we captured from the us_census data-set. It is a bit difficult to see anything if we try to look at them all together since the geographical areas are so small. But these spatial entities are now connected to the KBSaphid sample stations. 
+
 ```{r}
 tm_shape(KBSaphid_collection_sites_sp, ylim = c(20,50), xlim = c(-130,-65)) +
     tm_polygons()
 ```
 
-Ok, next we need to create spatial points which will capture climate information within each of the 14 station.
+OK, next we need to create spatial points which will capture climate information within each of the 14 stations.
 
-We generate 50 points, these are randomly distributed within each station shape, however the provision of points is dependent on the the station shape size. Larger areas get more points. Note that we should use as many sample points as possible to represent the station,  but we'll be restricted by memory and processing time so we'll keep this tutorial simple.
+We can generate 50 points, these are randomly distributed within each station shape, however the provision of points is dependent on the the station shape size. Larger areas get more points. Note that we should use as many sample points as possible to represent the station,  but we'll be restricted by memory and processing time so we'll keep this tutorial simple and only use a few points.
 
 ```{r}
-
 
 sample_points <- st_sample(KBSaphid_collection_sites_sp, 50) %>% # random points, as a list ...
   st_sf()  # ... to data frame ...
 
 ```
 
-Ok, so lets have a look what we have done. 
-If we filter KBSaphid_collection_sites_sp and choose one sampling station we can see that we have a shape file representing the area of the station where the aphids were sampled. We randomly asigned points to the area which we will use to extract climate information. 
+OK, so lets have a look what we have done. 
+If we filter KBSaphid_collection_sites_sp and choose one sampling station we can see that we have a shape file representing the area of the station where aphids were sampled. We randomly assigned points to the area which we will use to extract climate information. 
 
 ```{r}
 t <- dplyr::filter(KBSaphid_collection_sites_sp, NAME10 == "Manhattan, KS")
@@ -729,15 +729,14 @@ Now lets re-join our random sample points back to our station names.
 climate_sampling_points <- st_join(sample_points, KBSaphid_collection_sites_sp, join = st_intersects)
 ```
 
-The next thing we want to do is join the 'sample points' back to the main data-set.
+The next thing we want to do is join the 'sample points + station names' back to the dates in the main data-set.
 
-We first need to create a  dataset of unique sample sites and dates
+First we need to create a data-set of unique sample sites and dates
 
 ```{r}
 
 KBSaphid_collection_sites_dates <- 
   KBSaphid  %>%
-  tidyr::unite("sample_location", c("station","state"), sep = ", ", remove = FALSE) %>%
   dplyr::select(sample_date, sample_location) %>%
   dplyr::distinct()
   
@@ -749,12 +748,12 @@ Now lets query this with the climate sample points we made for each sample_locat
 KBSaphid_collection_sites_dates_with_random_points <- dplyr::inner_join(climate_sampling_points, KBSaphid_collection_sites_dates, by = c("NAME10" = "sample_location"))
 
 ```
-Now if you look at the KBSaphid_collection_sites_dates_with_random_points, you will see that we have all of the dates in the orginal study along with random points we created from the station shapes.  
 
-Next we want to spread the sampling dates out through the day. So we can repeat something similar to what we did with the mosquito data. 
+Now if you look at the KBSaphid_collection_sites_dates_with_random_points, you will see that we have all of the dates in the original study along with random points we created from the station shapes.  
 
-create a time variable, starting at 00.01, then every 6 hours. 
+Next we want to spread the sampling dates out throughout the day. So we can try to get an accurate reading of the weather for that day.
 
+Create a time variable, starting at 00.01, then every 6 hours. 
 
 ```{r}
 KBSaphid_collection_sites_dates_with_random_points_00  <- 
@@ -789,12 +788,12 @@ KBSaphid_all <- rbind(KBSaphid_collection_sites_dates_with_random_points_00,KBSa
 
 ```
 
-Now we are ready to retrieve information to our KBSaphid_all points and time data frame.  However, we need to reformat the spatial information for the RNCEP package. by turning the geomerty column into individual points. 
+Now we are ready to retrieve information to our KBSaphid_all points and time data frame.  However, we need to reformat the spatial information for the RNCEP package. by turning the geometry column into individual points. 
 
 
 ```{r}
 
-##create a function that allows us to converts spatial point data to points
+##create a function that allows us to convert spatial point data to numerical point locations
 sfc_as_cols <- function(x, names = c("x","y")) {
   stopifnot(inherits(x,"sf") && inherits(sf::st_geometry(x),"sfc_POINT"))
   ret <- sf::st_coordinates(x)
@@ -808,33 +807,46 @@ sfc_as_cols <- function(x, names = c("x","y")) {
 KBSaphid_all <- sfc_as_cols(KBSaphid_all)
 
 
-
 ```
-lets take a subset of the data merely for processing purposes, otherwise it will take all day
+
+we need to drop the spatial data for the next step, however keep the lat (y) long (x) data, as this is just numerical data.
+lets take a subset of the data for the sake of saving time
+
 ```{r}
 KBSaphid_all_no_geom <- 
   KBSaphid_all %>%
-  dplyr::mutate(sample_date = as.Date(sample_date, format = "%Y-%m-%d")) %>%
   st_set_geometry(NULL) %>%
   distinct()
 
-KBSaphid_Monroe <- dplyr::filter(KBSaphid_all_no_geom, NAME10 == "Monroe, MI", )
+KBSaphid_Monroe <- dplyr::filter(KBSaphid_all_no_geom, NAME10 == "Monroe, MI")
  
 ```
 
-```{r}
+lets gather the temperature data from the NCEP
 
-## Now collect cloud cover, temperature, and wind
-## information for each point in the subset ##
+```{r}
 
 KBSaphid_Monroe$temp <- NCEP.interp(variable='air.sig995', level='surface', lat=KBSaphid_Monroe$y, lon=KBSaphid_Monroe$x, dt=KBSaphid_Monroe$sample_datetime, reanalysis2=FALSE, keep.unpacking.info=TRUE)
 
 ```
 
-Next you want to take an average of all the tempertaure samples, 
-https://cran.r-project.org/web/packages/RNCEP/RNCEP.pdf
-You can also repeat the steps for the relative humidity (‘rhum.sig995’ Relative Humidity), which can be used as a proxy for rainfall. 
+At this point you could keep repeating the above step, extracting other climate variables for the NCEP database e.g. relative humidity (‘rhum.sig995’ Relative Humidity), which can be used as a proxy for rainfall. 
 
-Once you have download all the required data per sample location and time, you can average them by place name and date to get all the desired climate
+We now have a number of temperature data points for each station at a particular date-time. Note that we filtered station == "Monroe, MI" so we only extracted values for that locations.
 
-You can then requery this with the original data set to get all the climate variables. 
+Next lets take an average of the 6 hourly daily climate + the point locations in each station, creating a daily average temperature for each station. Note you could also add other climate variables to the summarize function.  
+
+```{r}
+KBSaphid_Monroe_av_daily_station_temp <-
+KBSaphid_Monroe %>% 
+  dplyr::group_by(NAME10, sample_date) %>%
+  dplyr::summarise(avg_daily_station_temp = mean(temp))
+```
+
+And now lets create a query that merges the temp data we just gathered back into the main data set. Again note that we have filter for the station 'Monroe' so it you won't retrieve all the values in the original data set, only those that match with this station.  
+
+```{r}
+KBSaphid_with_temps <- 
+  dplyr::inner_join(KBSaphid, KBSaphid_Monroe_av_daily_station_temp, by = c("sample_location" = "NAME10", "sample_date"="sample_date"))
+```
+
