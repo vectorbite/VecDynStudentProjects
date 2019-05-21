@@ -8,12 +8,27 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
+
+```{r}
+# install.packages("tidyverse")
+# install.packages("readr")
+# install.packages("plyr")
+# install.packages("scales")
+library(tidyverse)
+library(readr)
+library(plyr)
+library(scales)
+library(lubridate)
+
+```
+
+
 ### Template 
 
 Note that all data frame fields are created in character format,  you'll need to convert them to the correct formats at a later stage. You can use this data frame as a guide to help you convert your data-set to the VecDyn format. You can either import data into into the data frames below or just rename the field names of the data-set you are working on.  However,  you need to make sure all the columns are in the correct order as below,  even if your data set is missing certain fields. In this case you need to create them  and leave them blank. 
 
 ```{r}
-vecdyn_bulk_upload_template  <-data.frame(title=character(), 
+vecdyn_bulk_upload_template  <- data.frame(title=character(), 
                              collection_author=character(),
                              dataset_doi=character(),
                              publication_doi = character(),
@@ -57,4 +72,107 @@ vecdyn_bulk_upload_template  <-data.frame(title=character(),
                              stringsAsFactors=FALSE)
 #write.csv(VecDyn_template, file = "VecDyn_template.csv", row.names = FALSE)
                              
+```
+
+
+## VectorBase Bulk Data Compilation
+
+```{r}
+library(readr)
+vectorbasepublicationinfo <- read_csv("files/vectorbase/VectorBasePublicationInfo.csv", 
+    col_types = cols(X12 = col_character(), 
+        dev_stages_ss = col_character(), 
+        tags_ss = col_character()))
+View(VectorBasePublicationInfo)
+```
+
+
+```{r}
+vectorbite <- read_csv("files/vectorbase/abundance-2019-02.csv", 
+     col_types = cols(`Collection duration (days)` = col_character(), 
+         `Specimens collected` = col_character()))
+```
+
+
+```{r}
+head(vectorbite)
+```
+
+
+```{r}
+
+colnames(vectorbasepublicationinfo)
+
+```
+
+```{r}
+
+vectorbite <-dplyr::inner_join(vectorbite, vectorbasepublicationinfo, by = c("Projects" = "accession"))
+
+```
+
+```{r}
+vectorbite <- dplyr::select(vectorbite, -`Sample ID`, -Label, -`Collection ID`, -'X12', -'tags_ss', -"exp_citations_ss", -'licenses_ss', -'dev_stages_ss')
+```
+
+```{r}
+
+
+vectorbite <- filter(vectorbite, Projects %in% c('VBP0000281', 'VBP0000284', 'VBP0000332', 'VBP0000386', 'VBP0000229','VBP0000317', 'VBP0000333'))
+```
+ 
+```{r}
+colnames(vectorbite)
+```
+
+```{r}
+
+vectorbite <- separate(vectorbite, Coordinates, into = c("sample_lat_dd", "sample_long_dd"), sep = ",")
+
+
+```
+
+ 
+```{r}
+
+title <- vectorbite$label
+dataset_doi <- vectorbite$Citations
+description <- vectorbite$description
+contact_name <- vectorbite$authors
+dataset_license <- vectorbite$`Usage license`
+taxon <- vectorbite$Species
+location_description <- vectorbite$Locations
+sampling_protocol <- vectorbite$`Collection protocols`
+study_design <- vectorbite$study_designs
+sampling_method <- vectorbite$Attractants
+sample_end_date <- vectorbite$`Collection date range`
+sample_value <- vectorbite$`Specimens collected`
+sample_sex <- vectorbite$Sex
+sample_stage <- vectorbite$`Developmental stage`
+sample_lat_dd <- vectorbite$sample_lat_dd
+sample_long_dd <- vectorbite$sample_long_dd
+
+
+```
+
+
+```{r}
+
+a <- cbind(title, dataset_doi, description, contact_name, dataset_license, taxon, sample_value, sample_sex, sample_stage, sample_end_date, sample_lat_dd, sample_long_dd, location_description, sampling_method, sampling_protocol)
+
+a <- data.frame(a, stringsAsFactors=FALSE)
+
+vecdyn_vectorbase_bulk_upload_dataset  <- rbind.fill(vecdyn_bulk_upload_template , a)
+
+
+```
+
+
+```{r}
+vecdyn_vectorbase_bulk_upload_dataset <- 
+  vecdyn_vectorbase_bulk_upload_dataset %>%
+  dplyr::mutate(sample_end_date = as.Date(as.character(sample_end_date, format = "%Y/%m/%d"))) %>%
+  dplyr::mutate(sample_value = as.numeric(sample_value))
+
+
 ```
