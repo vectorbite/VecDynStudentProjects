@@ -3,5 +3,6 @@
 !*.png
 !*.Rmd
 !*.pdf
+!*.R
 .Rproj.user
 
