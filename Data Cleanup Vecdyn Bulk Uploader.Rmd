@@ -96,11 +96,6 @@ vectorbite <- read_csv("files/vectorbase/abundance-2019-02.csv",
 
 
 ```{r}
-head(vectorbite)
-```
-
-
-```{r}
 
 colnames(vectorbasepublicationinfo)
 
@@ -113,32 +108,26 @@ vectorbite <-dplyr::inner_join(vectorbite, vectorbasepublicationinfo, by = c("Pr
 ```
 
 ```{r}
-vectorbite <- dplyr::select(vectorbite, -`Sample ID`, -Label, -`Collection ID`, -'X12.x', -'tags_ss', -"exp_citations_ss", -'licenses_ss', -'dev_stages_ss')
+vectorbite <- dplyr::select(vectorbite, -`Sample ID`, -Label, -`Collection ID`, -'X12', -'tags_ss', -"exp_citations_ss", -'licenses_ss', -'dev_stages_ss')
+```
+
+```{r}
+head(vectorbite)
 ```
 
 
-```{r}
-
-# filter by date year month
-
-dataBySpFem <- 
-  vectorbite %<>%
-  dplyr::filter(nchar('collection date range' < 8))
-
-``` 
-
-
-
-
-```{r}
-
-
-vectorbite <- filter(vectorbite, Projects %in% c('VBP0000281', 'VBP0000284', 'VBP0000332', 'VBP0000386', 'VBP0000229','VBP0000317', 'VBP0000333'))
-```
- 
 ```{r}
 colnames(vectorbite)
 ```
+
+
+```{r}
+vectorbite  <- 
+  vectorbite %>%
+  dplyr::filter(str_detect(`Collection date range`, regex("^\\d{4}[-]\\d{2}[-]\\d{2}$", multiline = TRUE)))
+
+```
+
 
 ```{r}
 
@@ -189,7 +178,6 @@ vecdyn_vectorbase_bulk_upload_dataset <-
   dplyr::mutate(sample_end_date = as.Date(as.character(sample_end_date, format = "%Y/%m/%d"))) %>%
   dplyr::mutate(sample_value = as.numeric(sample_value))
 
-
 ```
 
 
@@ -216,3 +204,27 @@ vecdyn_vectorbase_bulk_upload_dataset  %>%
   distinct()
 ```
 
+# cut stuff
+
+```{r}
+
+# filter by date year month
+
+vectorbite_year_month <- 
+  vectorbite %>% filter(nchar('collection date range' < 8))
+
+mtcars %>% 
+  filter(str_detect(rowname, "^L"))
+
+
+``` 
+
+
+
+
+```{r}
+
+
+vectorbite <- filter(vectorbite, Projects %in% c('VBP0000281', 'VBP0000284', 'VBP0000332', 'VBP0000386', 'VBP0000229','VBP0000317', 'VBP0000333'))
+```
+ 
